@@ -67,10 +67,8 @@ export class SQLiteDOSession<TFullSchema extends Record<string, unknown>, TSchem
 		_config?: SQLiteTransactionConfig,
 	): T {
 		const tx = new SQLiteDOTransaction('sync', this.dialect, this, this.schema);
-		this.client.transactionSync(() => {
-			transaction(tx);
-		});
-		return {} as any;
+		const result = this.client.transactionSync(() => transaction(tx));
+		return result;
 	}
 }
 
@@ -86,9 +84,8 @@ export class SQLiteDOTransaction<TFullSchema extends Record<string, unknown>, TS
 
 	override transaction<T>(transaction: (tx: SQLiteDOTransaction<TFullSchema, TSchema>) => T): T {
 		const tx = new SQLiteDOTransaction('sync', this.dialect, this.session, this.schema, this.nestedIndex + 1);
-		this.session.transaction(() => transaction(tx));
-
-		return {} as any;
+		const result = this.session.transaction(() => transaction(tx));
+		return result;
 	}
 }
 
